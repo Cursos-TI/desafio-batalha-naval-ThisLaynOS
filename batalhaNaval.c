@@ -1,124 +1,153 @@
 #include <stdio.h>
 
 // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-// BATALHA NAVAL - NIVEL NOVATO
+// BATALHA NAVAL - NIVEL AVENTUREIRO
 //
-// Objetivo: Posicionar 2 navios (1 horizontal, 1 vertical) no tabuleiro
-// Tabuleiro: matriz 10x10
-// Navios: tamanho fixo de 3 posicoes cada
+// Continuacao do Nivel Novato.
+// Novidade: posicionamento de 4 navios no total
+//   - Navio 1: horizontal  (mantido do novato)
+//   - Navio 2: vertical    (mantido do novato)
+//   - Navio 3: diagonal principal (linha e coluna aumentam juntos)
+//   - Navio 4: diagonal secundaria (linha aumenta, coluna diminui)
+//
+// Tabuleiro: 10x10  |  Tamanho de cada navio: 3
 // Representacao: 0 = agua, 3 = navio
 // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
-#define TAMANHO_TABULEIRO 10
-#define TAMANHO_NAVIO 3
-#define AGUA 0
-#define NAVIO 3
+#define TAMANHO  10
+#define NAVIO_SZ 3
+#define AGUA     0
+#define NAVIO    3
 
 int main() {
-    
+
     // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
     // 1. DECLARACAO E INICIALIZACAO DO TABULEIRO
-    // Matriz 10x10 inicializada com 0 (agua)
+    // Matriz 10x10 preenchida com 0 (agua)
     // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-    
-    int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO];
-    
-    // Inicializar todo o tabuleiro com agua (0)
-    for (int linha = 0; linha < TAMANHO_TABULEIRO; linha++) {
-        for (int coluna = 0; coluna < TAMANHO_TABULEIRO; coluna++) {
-            tabuleiro[linha][coluna] = AGUA;
+
+    int tabuleiro[TAMANHO][TAMANHO];
+
+    for (int i = 0; i < TAMANHO; i++) {
+        for (int j = 0; j < TAMANHO; j++) {
+            tabuleiro[i][j] = AGUA;
         }
     }
-    
-    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-    // 2. DECLARACAO DOS VETORES REPRESENTANDO OS NAVIOS
-    // Cada navio tem tamanho 3 e e representado pelo valor 3
-    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-    
-    int navioHorizontal[TAMANHO_NAVIO] = {NAVIO, NAVIO, NAVIO};
-    int navioVertical[TAMANHO_NAVIO] = {NAVIO, NAVIO, NAVIO};
-    
+
+    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+    // 2. VETORES DOS NAVIOS
+    // Cada vetor representa um navio com 3 posicoes de valor 3
+    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+
+    int navioHorizontal [NAVIO_SZ] = {NAVIO, NAVIO, NAVIO};
+    int navioVertical   [NAVIO_SZ] = {NAVIO, NAVIO, NAVIO};
+    int navioDiagPrin   [NAVIO_SZ] = {NAVIO, NAVIO, NAVIO}; // diagonal principal
+    int navioDiagSec    [NAVIO_SZ] = {NAVIO, NAVIO, NAVIO}; // diagonal secundaria
+
     // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-    // 3. POSICIONAMENTO DO NAVIO HORIZONTAL
-    // Coordenada inicial: linha 2, coluna 1
-    // Ocupa as posicoes: (2,1), (2,2), (2,3)
+    // 3. NAVIO HORIZONTAL - linha 2, coluna 1  -> posicoes (2,1)(2,2)(2,3)
+    // Loop copia navioHorizontal[i] para tabuleiro[linhaH][colunaH + i]
     // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-    
-    int linhaH = 2;    // linha inicial do navio horizontal
-    int colunaH = 1;   // coluna inicial do navio horizontal
-    
-    // Validacao: verificar se o navio horizontal cabe no tabuleiro
-    if (colunaH + TAMANHO_NAVIO <= TAMANHO_TABULEIRO) {
-        // Copiar os valores do vetor navioHorizontal para o tabuleiro
-        for (int i = 0; i < TAMANHO_NAVIO; i++) {
+
+    int linhaH = 2, colunaH = 1;
+
+    if (colunaH + NAVIO_SZ <= TAMANHO) {
+        for (int i = 0; i < NAVIO_SZ; i++) {
             tabuleiro[linhaH][colunaH + i] = navioHorizontal[i];
         }
-        printf("Navio horizontal posicionado com sucesso na linha %d, colunas %d-%d\n",
-               linhaH, colunaH, colunaH + TAMANHO_NAVIO - 1);
-    } else {
-        printf("ERRO: Navio horizontal nao cabe no tabuleiro!\n");
+        printf("Navio horizontal posicionado: linha %d, colunas %d-%d\n",
+               linhaH, colunaH, colunaH + NAVIO_SZ - 1);
     }
-    
+
     // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-    // 4. POSICIONAMENTO DO NAVIO VERTICAL
-    // Coordenada inicial: linha 5, coluna 7
-    // Ocupa as posicoes: (5,7), (6,7), (7,7)
+    // 4. NAVIO VERTICAL - linha 5, coluna 7  -> posicoes (5,7)(6,7)(7,7)
+    // Loop copia navioVertical[i] para tabuleiro[linhaV + i][colunaV]
     // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-    
-    int linhaV = 5;    // linha inicial do navio vertical
-    int colunaV = 7;   // coluna inicial do navio vertical
-    
-    // Validacao: verificar se o navio vertical cabe no tabuleiro
-    if (linhaV + TAMANHO_NAVIO <= TAMANHO_TABULEIRO) {
-        // Verificar se nao ha sobreposicao com navio horizontal
-        int sobreposicao = 0;
-        for (int i = 0; i < TAMANHO_NAVIO; i++) {
-            if (tabuleiro[linhaV + i][colunaV] != AGUA) {
-                sobreposicao = 1;
-                break;
-            }
+
+    int linhaV = 5, colunaV = 7;
+
+    if (linhaV + NAVIO_SZ <= TAMANHO) {
+        int sobreposto = 0;
+        for (int i = 0; i < NAVIO_SZ; i++) {
+            if (tabuleiro[linhaV + i][colunaV] != AGUA) { sobreposto = 1; break; }
         }
-        
-        if (!sobreposicao) {
-            // Copiar os valores do vetor navioVertical para o tabuleiro
-            for (int i = 0; i < TAMANHO_NAVIO; i++) {
+        if (!sobreposto) {
+            for (int i = 0; i < NAVIO_SZ; i++) {
                 tabuleiro[linhaV + i][colunaV] = navioVertical[i];
             }
-            printf("Navio vertical posicionado com sucesso na coluna %d, linhas %d-%d\n",
-                   colunaV, linhaV, linhaV + TAMANHO_NAVIO - 1);
-        } else {
-            printf("ERRO: Navio vertical se sobrepoe a outro navio!\n");
+            printf("Navio vertical posicionado: coluna %d, linhas %d-%d\n",
+                   colunaV, linhaV, linhaV + NAVIO_SZ - 1);
         }
-    } else {
-        printf("ERRO: Navio vertical nao cabe no tabuleiro!\n");
     }
-    
+
+    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+    // 5. NAVIO DIAGONAL PRINCIPAL - linha 0, coluna 0
+    // Linha e coluna aumentam simultaneamente: tabuleiro[linha+i][coluna+i]
+    // Posicoes: (0,0), (1,1), (2,2)
+    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+
+    int linhaDP = 0, colunaDP = 0;
+
+    if (linhaDP + NAVIO_SZ <= TAMANHO && colunaDP + NAVIO_SZ <= TAMANHO) {
+        int sobreposto = 0;
+        for (int i = 0; i < NAVIO_SZ; i++) {
+            if (tabuleiro[linhaDP + i][colunaDP + i] != AGUA) { sobreposto = 1; break; }
+        }
+        if (!sobreposto) {
+            for (int i = 0; i < NAVIO_SZ; i++) {
+                tabuleiro[linhaDP + i][colunaDP + i] = navioDiagPrin[i];
+            }
+            printf("Navio diagonal principal posicionado: inicio (%d,%d) -> (%d,%d)\n",
+                   linhaDP, colunaDP, linhaDP + NAVIO_SZ - 1, colunaDP + NAVIO_SZ - 1);
+        }
+    }
+
+    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+    // 6. NAVIO DIAGONAL SECUNDARIA - linha 0, coluna 9
+    // Linha aumenta, coluna diminui: tabuleiro[linha+i][coluna-i]
+    // Posicoes: (0,9), (1,8), (2,7)
+    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+
+    int linhaDS = 0, colunaDS = 9;
+
+    if (linhaDS + NAVIO_SZ <= TAMANHO && colunaDS - (NAVIO_SZ - 1) >= 0) {
+        int sobreposto = 0;
+        for (int i = 0; i < NAVIO_SZ; i++) {
+            if (tabuleiro[linhaDS + i][colunaDS - i] != AGUA) { sobreposto = 1; break; }
+        }
+        if (!sobreposto) {
+            for (int i = 0; i < NAVIO_SZ; i++) {
+                tabuleiro[linhaDS + i][colunaDS - i] = navioDiagSec[i];
+            }
+            printf("Navio diagonal secundaria posicionado: inicio (%d,%d) -> (%d,%d)\n",
+                   linhaDS, colunaDS, linhaDS + NAVIO_SZ - 1, colunaDS - (NAVIO_SZ - 1));
+        }
+    }
+
     // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-    // 5. EXIBICAO DO TABULEIRO
-    // Loop aninhado para imprimir a matriz completa
-    // 0 = agua, 3 = partes do navio
+    // 7. EXIBICAO DO TABULEIRO COMPLETO
+    // Loops aninhados percorrem toda a matriz e imprimem cada elemento
     // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-    
+
     printf("\n=== TABULEIRO BATALHA NAVAL ===\n\n");
-    
-    // Cabecalho com numeros das colunas
-    printf("   ");  // espacamento para alinhamento
-    for (int col = 0; col < TAMANHO_TABULEIRO; col++) {
+
+    // Cabecalho com indices das colunas
+    printf("   ");
+    for (int col = 0; col < TAMANHO; col++) {
         printf("%d ", col);
     }
     printf("\n");
-    
-    // Imprimir cada linha do tabuleiro com numero da linha
-    for (int linha = 0; linha < TAMANHO_TABULEIRO; linha++) {
-        printf("%d  ", linha);  // numero da linha
-        
-        for (int coluna = 0; coluna < TAMANHO_TABULEIRO; coluna++) {
-            printf("%d ", tabuleiro[linha][coluna]);
+
+    // Linhas do tabuleiro com indice da linha a esquerda
+    for (int i = 0; i < TAMANHO; i++) {
+        printf("%d  ", i);
+        for (int j = 0; j < TAMANHO; j++) {
+            printf("%d ", tabuleiro[i][j]);
         }
-        printf("\n");  // quebra de linha apos cada linha completa
+        printf("\n");
     }
-    
+
     printf("\nLegenda: 0 = Agua | 3 = Navio\n");
-    
+
     return 0;
 }
