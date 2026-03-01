@@ -1,144 +1,228 @@
 #include <stdio.h>
 
-// _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-// BATALHA NAVAL - NIVEL AVENTUREIRO
+// _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+// BATALHA NAVAL - NIVEL MESTRE
 //
-// Continuacao do Nivel Novato.
-// Novidade: posicionamento de 4 navios no total
-//   - Navio 1: horizontal  (mantido do novato)
-//   - Navio 2: vertical    (mantido do novato)
-//   - Navio 3: diagonal principal (linha e coluna aumentam juntos)
-//   - Navio 4: diagonal secundaria (linha aumenta, coluna diminui)
+// Continuacao do Nivel Aventureiro.
+// Novidade: 3 habilidades especiais com areas de efeito distintas
+//   - Cone:     area que se expande para baixo a partir do ponto de origem
+//   - Cruz:     linha horizontal + linha vertical centradas no ponto de origem
+//   - Octaedro: formato de losango centrado no ponto de origem
 //
-// Tabuleiro: 10x10  |  Tamanho de cada navio: 3
-// Representacao: 0 = agua, 3 = navio
-// _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+// As matrizes de habilidade (5x5) usam: 0 = nao afetado, 1 = afetado
+// No tabuleiro: 0 = agua, 3 = navio, 5 = area afetada por habilidade
+//
+// Obrigatorio: construir as matrizes com condicionais dentro de loops
+// _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
-#define TAMANHO  10
-#define NAVIO_SZ 3
-#define AGUA     0
-#define NAVIO    3
+#define TAMANHO   10
+#define NAVIO_SZ  3
+#define HAB_SZ    5    // tamanho das matrizes de habilidade (5x5)
+#define AGUA      0
+#define NAVIO     3
+#define HABILIDADE 5
 
 int main() {
 
     // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-    // 1. DECLARACAO E INICIALIZACAO DO TABULEIRO
-    // Matriz 10x10 preenchida com 0 (agua)
+    // 1. TABULEIRO 10x10 inicializado com agua (0)
     // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
     int tabuleiro[TAMANHO][TAMANHO];
 
-    for (int i = 0; i < TAMANHO; i++) {
-        for (int j = 0; j < TAMANHO; j++) {
+    for (int i = 0; i < TAMANHO; i++)
+        for (int j = 0; j < TAMANHO; j++)
             tabuleiro[i][j] = AGUA;
-        }
-    }
 
     // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-    // 2. VETORES DOS NAVIOS
-    // Cada vetor representa um navio com 3 posicoes de valor 3
+    // 2. VETORES DOS NAVIOS e posicionamento (herdado do aventureiro)
     // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
-    int navioHorizontal [NAVIO_SZ] = {NAVIO, NAVIO, NAVIO};
-    int navioVertical   [NAVIO_SZ] = {NAVIO, NAVIO, NAVIO};
-    int navioDiagPrin   [NAVIO_SZ] = {NAVIO, NAVIO, NAVIO}; // diagonal principal
-    int navioDiagSec    [NAVIO_SZ] = {NAVIO, NAVIO, NAVIO}; // diagonal secundaria
+    int navioH[NAVIO_SZ]  = {NAVIO, NAVIO, NAVIO}; // horizontal
+    int navioV[NAVIO_SZ]  = {NAVIO, NAVIO, NAVIO}; // vertical
+    int navioDP[NAVIO_SZ] = {NAVIO, NAVIO, NAVIO}; // diagonal principal
+    int navioDS[NAVIO_SZ] = {NAVIO, NAVIO, NAVIO}; // diagonal secundaria
 
-    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-    // 3. NAVIO HORIZONTAL - linha 2, coluna 1  -> posicoes (2,1)(2,2)(2,3)
-    // Loop copia navioHorizontal[i] para tabuleiro[linhaH][colunaH + i]
-    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+    // Navio horizontal: linha 2, coluna 1 -> (2,1)(2,2)(2,3)
+    for (int i = 0; i < NAVIO_SZ; i++)
+        tabuleiro[2][1 + i] = navioH[i];
 
-    int linhaH = 2, colunaH = 1;
+    // Navio vertical: linha 5, coluna 7 -> (5,7)(6,7)(7,7)
+    for (int i = 0; i < NAVIO_SZ; i++)
+        tabuleiro[5 + i][7] = navioV[i];
 
-    if (colunaH + NAVIO_SZ <= TAMANHO) {
-        for (int i = 0; i < NAVIO_SZ; i++) {
-            tabuleiro[linhaH][colunaH + i] = navioHorizontal[i];
-        }
-        printf("Navio horizontal posicionado: linha %d, colunas %d-%d\n",
-               linhaH, colunaH, colunaH + NAVIO_SZ - 1);
-    }
+    // Navio diagonal principal: (0,0)(1,1)(2,2)
+    for (int i = 0; i < NAVIO_SZ; i++)
+        tabuleiro[0 + i][0 + i] = navioDP[i];
 
-    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-    // 4. NAVIO VERTICAL - linha 5, coluna 7  -> posicoes (5,7)(6,7)(7,7)
-    // Loop copia navioVertical[i] para tabuleiro[linhaV + i][colunaV]
-    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+    // Navio diagonal secundaria: (0,9)(1,8)(2,7)
+    for (int i = 0; i < NAVIO_SZ; i++)
+        tabuleiro[0 + i][9 - i] = navioDS[i];
 
-    int linhaV = 5, colunaV = 7;
+    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+    // 3. MATRIZES DE HABILIDADE (5x5) construidas com condicionais em loops
+    //
+    // Cada matriz usa: 1 = posicao afetada, 0 = posicao nao afetada
+    // O centro logico de cada matriz e a posicao [2][2] (indice central de 5x5)
+    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
-    if (linhaV + NAVIO_SZ <= TAMANHO) {
-        int sobreposto = 0;
-        for (int i = 0; i < NAVIO_SZ; i++) {
-            if (tabuleiro[linhaV + i][colunaV] != AGUA) { sobreposto = 1; break; }
-        }
-        if (!sobreposto) {
-            for (int i = 0; i < NAVIO_SZ; i++) {
-                tabuleiro[linhaV + i][colunaV] = navioVertical[i];
+    int cone[HAB_SZ][HAB_SZ];
+    int cruz[HAB_SZ][HAB_SZ];
+    int octaedro[HAB_SZ][HAB_SZ];
+
+    // -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+    // CONE: ponto de origem no topo (linha 0, coluna central), expande para baixo
+    // A largura do cone aumenta 1 celula para cada lado por linha percorrida
+    //
+    // Linha 0: apenas coluna central [0][2]         -> 0 0 1 0 0
+    // Linha 1: coluna central +/- 1  [1][1..3]      -> 0 1 1 1 0
+    // Linha 2: coluna central +/- 2  [2][0..4]      -> 1 1 1 1 1
+    // Linhas 3 e 4: fora do alcance do cone          -> 0 0 0 0 0
+    //
+    // Condicional: j >= (centro - i) && j <= (centro + i) && i <= 2
+    // -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+
+    int centro = HAB_SZ / 2; // centro = 2 para matriz 5x5
+
+    for (int i = 0; i < HAB_SZ; i++) {
+        for (int j = 0; j < HAB_SZ; j++) {
+            // Afetado se a coluna estiver dentro da expansao do cone na linha i
+            // e a linha i estiver dentro da altura do cone (ate linha 2)
+            if (i <= centro && j >= (centro - i) && j <= (centro + i)) {
+                cone[i][j] = 1;
+            } else {
+                cone[i][j] = 0;
             }
-            printf("Navio vertical posicionado: coluna %d, linhas %d-%d\n",
-                   colunaV, linhaV, linhaV + NAVIO_SZ - 1);
         }
     }
 
-    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-    // 5. NAVIO DIAGONAL PRINCIPAL - linha 0, coluna 0
-    // Linha e coluna aumentam simultaneamente: tabuleiro[linha+i][coluna+i]
-    // Posicoes: (0,0), (1,1), (2,2)
-    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+    // -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+    // CRUZ: linha horizontal e coluna vertical passando pelo centro [2][2]
+    //
+    // Afetado se i == centro (linha central) OU j == centro (coluna central)
+    // Resultado:
+    // 0 0 1 0 0
+    // 0 0 1 0 0
+    // 1 1 1 1 1
+    // 0 0 1 0 0
+    // 0 0 1 0 0
+    // -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 
-    int linhaDP = 0, colunaDP = 0;
-
-    if (linhaDP + NAVIO_SZ <= TAMANHO && colunaDP + NAVIO_SZ <= TAMANHO) {
-        int sobreposto = 0;
-        for (int i = 0; i < NAVIO_SZ; i++) {
-            if (tabuleiro[linhaDP + i][colunaDP + i] != AGUA) { sobreposto = 1; break; }
-        }
-        if (!sobreposto) {
-            for (int i = 0; i < NAVIO_SZ; i++) {
-                tabuleiro[linhaDP + i][colunaDP + i] = navioDiagPrin[i];
+    for (int i = 0; i < HAB_SZ; i++) {
+        for (int j = 0; j < HAB_SZ; j++) {
+            if (i == centro || j == centro) {
+                cruz[i][j] = 1;
+            } else {
+                cruz[i][j] = 0;
             }
-            printf("Navio diagonal principal posicionado: inicio (%d,%d) -> (%d,%d)\n",
-                   linhaDP, colunaDP, linhaDP + NAVIO_SZ - 1, colunaDP + NAVIO_SZ - 1);
         }
     }
 
-    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-    // 6. NAVIO DIAGONAL SECUNDARIA - linha 0, coluna 9
-    // Linha aumenta, coluna diminui: tabuleiro[linha+i][coluna-i]
-    // Posicoes: (0,9), (1,8), (2,7)
-    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+    // -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+    // OCTAEDRO (losango): formato de diamante centrado em [2][2]
+    //
+    // Afetado se a distancia de Manhattan do centro for <= raio (centro = 2)
+    // Distancia de Manhattan: |i - centro| + |j - centro| <= centro
+    //
+    // Resultado:
+    // 0 0 1 0 0
+    // 0 1 1 1 0
+    // 1 1 1 1 1
+    // 0 1 1 1 0
+    // 0 0 1 0 0
+    // -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 
-    int linhaDS = 0, colunaDS = 9;
+    for (int i = 0; i < HAB_SZ; i++) {
+        for (int j = 0; j < HAB_SZ; j++) {
+            // Calcula distancia de Manhattan entre (i,j) e o centro (2,2)
+            int distLinha  = i - centro;
+            int distColuna = j - centro;
 
-    if (linhaDS + NAVIO_SZ <= TAMANHO && colunaDS - (NAVIO_SZ - 1) >= 0) {
-        int sobreposto = 0;
-        for (int i = 0; i < NAVIO_SZ; i++) {
-            if (tabuleiro[linhaDS + i][colunaDS - i] != AGUA) { sobreposto = 1; break; }
-        }
-        if (!sobreposto) {
-            for (int i = 0; i < NAVIO_SZ; i++) {
-                tabuleiro[linhaDS + i][colunaDS - i] = navioDiagSec[i];
+            // Valor absoluto manual (sem abs() para usar apenas logica condicional)
+            if (distLinha  < 0) distLinha  = -distLinha;
+            if (distColuna < 0) distColuna = -distColuna;
+
+            if (distLinha + distColuna <= centro) {
+                octaedro[i][j] = 1;
+            } else {
+                octaedro[i][j] = 0;
             }
-            printf("Navio diagonal secundaria posicionado: inicio (%d,%d) -> (%d,%d)\n",
-                   linhaDS, colunaDS, linhaDS + NAVIO_SZ - 1, colunaDS - (NAVIO_SZ - 1));
         }
     }
 
-    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-    // 7. EXIBICAO DO TABULEIRO COMPLETO
-    // Loops aninhados percorrem toda a matriz e imprimem cada elemento
-    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+    // 4. INTEGRACAO DAS HABILIDADES AO TABULEIRO
+    //
+    // Para cada habilidade, define-se um ponto de origem no tabuleiro.
+    // A matriz de habilidade e sobreposta ao tabuleiro centrada nesse ponto.
+    // O offset calcula o deslocamento entre o indice da matriz de habilidade
+    // e o indice real no tabuleiro: linha_tabuleiro = origemLinha + (i - centro)
+    //
+    // Posicoes afetadas (valor 1 na matriz de habilidade) sao marcadas com 5
+    // no tabuleiro, desde que estejam dentro dos limites (0 a 9).
+    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
-    printf("\n=== TABULEIRO BATALHA NAVAL ===\n\n");
+    // Ponto de origem do CONE no tabuleiro: linha 4, coluna 4
+    int origemConeL = 4, origemConeC = 4;
 
-    // Cabecalho com indices das colunas
+    for (int i = 0; i < HAB_SZ; i++) {
+        for (int j = 0; j < HAB_SZ; j++) {
+            // Converte indice da matriz de habilidade para coordenada do tabuleiro
+            int tL = origemConeL + (i - centro); // linha no tabuleiro
+            int tC = origemConeC + (j - centro); // coluna no tabuleiro
+
+            // Verifica limites do tabuleiro antes de marcar
+            if (tL >= 0 && tL < TAMANHO && tC >= 0 && tC < TAMANHO) {
+                if (cone[i][j] == 1) {
+                    tabuleiro[tL][tC] = HABILIDADE;
+                }
+            }
+        }
+    }
+
+    // Ponto de origem da CRUZ no tabuleiro: linha 7, coluna 3
+    int origemCruzL = 7, origemCruzC = 3;
+
+    for (int i = 0; i < HAB_SZ; i++) {
+        for (int j = 0; j < HAB_SZ; j++) {
+            int tL = origemCruzL + (i - centro);
+            int tC = origemCruzC + (j - centro);
+
+            if (tL >= 0 && tL < TAMANHO && tC >= 0 && tC < TAMANHO) {
+                if (cruz[i][j] == 1) {
+                    tabuleiro[tL][tC] = HABILIDADE;
+                }
+            }
+        }
+    }
+
+    // Ponto de origem do OCTAEDRO no tabuleiro: linha 4, coluna 8
+    int origemOctL = 4, origemOctC = 8;
+
+    for (int i = 0; i < HAB_SZ; i++) {
+        for (int j = 0; j < HAB_SZ; j++) {
+            int tL = origemOctL + (i - centro);
+            int tC = origemOctC + (j - centro);
+
+            if (tL >= 0 && tL < TAMANHO && tC >= 0 && tC < TAMANHO) {
+                if (octaedro[i][j] == 1) {
+                    tabuleiro[tL][tC] = HABILIDADE;
+                }
+            }
+        }
+    }
+
+    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+    // 5. EXIBICAO DO TABULEIRO FINAL
+    // 0 = agua, 3 = navio, 5 = area afetada por habilidade
+    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+
+    printf("=== TABULEIRO BATALHA NAVAL - NIVEL MESTRE ===\n\n");
+
     printf("   ");
-    for (int col = 0; col < TAMANHO; col++) {
-        printf("%d ", col);
-    }
+    for (int col = 0; col < TAMANHO; col++) printf("%d ", col);
     printf("\n");
 
-    // Linhas do tabuleiro com indice da linha a esquerda
     for (int i = 0; i < TAMANHO; i++) {
         printf("%d  ", i);
         for (int j = 0; j < TAMANHO; j++) {
@@ -147,7 +231,29 @@ int main() {
         printf("\n");
     }
 
-    printf("\nLegenda: 0 = Agua | 3 = Navio\n");
+    printf("\nLegenda: 0 = Agua | 3 = Navio | 5 = Area de habilidade\n");
+
+    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+    // 6. EXIBICAO DAS MATRIZES DE HABILIDADE ISOLADAS (para debug)
+    // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+
+    printf("\n--- Matriz CONE (origem tabuleiro: %d,%d) ---\n", origemConeL, origemConeC);
+    for (int i = 0; i < HAB_SZ; i++) {
+        for (int j = 0; j < HAB_SZ; j++) printf("%d ", cone[i][j]);
+        printf("\n");
+    }
+
+    printf("\n--- Matriz CRUZ (origem tabuleiro: %d,%d) ---\n", origemCruzL, origemCruzC);
+    for (int i = 0; i < HAB_SZ; i++) {
+        for (int j = 0; j < HAB_SZ; j++) printf("%d ", cruz[i][j]);
+        printf("\n");
+    }
+
+    printf("\n--- Matriz OCTAEDRO (origem tabuleiro: %d,%d) ---\n", origemOctL, origemOctC);
+    for (int i = 0; i < HAB_SZ; i++) {
+        for (int j = 0; j < HAB_SZ; j++) printf("%d ", octaedro[i][j]);
+        printf("\n");
+    }
 
     return 0;
 }
